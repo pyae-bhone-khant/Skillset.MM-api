@@ -1,0 +1,82 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+
+// ၁။ ROLE ကို ENUM အနေနဲ့ သတ်မှတ်မယ် (မှားရိုက်လို့ မရအောင် ကာကွယ်ဖို့)
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+// ၂။ USER MODEL: အကောင့်ဝင်ဖို့အတွက် အခြေခံအချက်အလက်များ
+model User {
+  id          String   @id @default(uuid())
+  email       String   @unique
+  password    String   // Bcrypt နဲ့ Hash လုပ်ပြီးမှ သိမ်းရမယ့် Password
+  role        Role     @default(STUDENT) // အကောင့်စဖွင့်ချင်း ကျောင်းသားအနေနဲ့ပဲ စမယ်
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relationships (တခြား Model တွေနဲ့ ချိတ်ဆက်မှု)
+  profile     Profile? // One-to-One: အကောင့်တစ်ခုမှာ ပရိုဖိုင်တစ်ခုပဲ ရှိမယ်
+  courses     Course[] // One-to-Many: ဆရာဖြစ်လာရင် သင်တန်းတွေ အများကြီး တင်နိုင်မယ်
+  blogs       Blog[]   // One-to-Many: ဆရာဖြစ်လာရင် Blog တွေ အများကြီး တင်နိုင်မယ်
+}
+
+// ၃။ PROFILE MODEL: ဆရာရော ကျောင်းသားပါ ကိုယ်ပိုင်အချက်အလက်နှင့် ပုံတင်ရန်
+model Profile {
+  id         String   @id @default(uuid())
+  userId     String   @unique
+  // onDelete: Cascade ကြောင့် Admin က User ကို ဖျက်လိုက်ရင် Profile ပါ တစ်ခါတည်း အလိုအလျောက် ပျက်သွားမယ်
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName   String
+  bio        String?  // ဆရာဆိုရင် သူ့အကြောင်း/ကိုယ်ရေးအကျဉ်း မိတ်ဆက်ရေးဖို့
+  imageUrl  String?  // ပရိုဖိုင်ဓာတ်ပုံအတွက် Cloudinary URL (စစချင်းမှာ null ဖြစ်နိုင်လို့ optional ပေးထားတယ်)
+  category   String?  // ဆရာတွေအတွက် သီးသန့်နယ်ပယ် (ဥပမာ - IT, English, Cooking, Art)
+  updatedAt  DateTime @updatedAt
+}
+
+// ၄။ COURSE MODEL: ဆရာတွေ တင်မယ့် သင်တန်းများ
+model Course {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @db.Text // စာသားအရှည်ကြီး ရေးလို့ရအောင်
+  category    String   // IT, Language, Cooking စသဖြင့် အမျိုးအစား ခွဲဖို့ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လို့ရအောင်)
+  teacherId   String
+  teacher     User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  
+  chapters    Chapter[] // One-to-Many: သင်တန်းတစ်ခုမှာ အခန်းတွေ အများကြီး ပါမယ် 
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ၅။ CHAPTER MODEL: သင်တန်းတစ်ခုချင်းစီရဲ့ ဗီဒီယို သင်ခန်းစာ ခေါင်းစဉ်များ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လို့ရအောင်)
+model Chapter {
+  id        String   @id @default(uuid())
+  title     String   // ဗီဒီယိုခေါင်းစဉ်
+  videoUrl  String   // YouTube Embed Link ဒါမှမဟုတ် တခြား Free Video Link များ
+  courseId  String 
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ၆။ BLOG MODEL: ဆရာတွေ ရေးသား မျှဝေမယ့် ဆောင်းပါးများ
+model Blog {
+  id        String   @id @default(uuid())
+  title     String
+  content   String   @db.Text // Blog စာကိုယ် (Rich text တွေ သိမ်းဖို့)
+  category  String   // IT, Art, General Knowledge
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
