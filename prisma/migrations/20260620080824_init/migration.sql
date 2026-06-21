@@ -19,6 +19,7 @@ CREATE TABLE "Profile" (
     "userId" TEXT NOT NULL,
     "fullName" TEXT NOT NULL,
     "bio" TEXT,
+    "publicId" TEXT,
     "avatarUrl" TEXT,
     "category" TEXT,
     "updatedAt" TIMESTAMP(3) NOT NULL,

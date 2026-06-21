@@ -19,6 +19,7 @@ export const updateProfile = [
   body("category").optional().isString(),
 
   async (req: Request, res: Response) => {
+    console.log("Profile update request:", req.body);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ success: false, errors: errors.array() });
@@ -27,28 +28,46 @@ export const updateProfile = [
     try {
       const userId = (req.user as any)?.id;
       const user = await getUserById(userId);
+      const { fullName, bio, category } = req.body;
+      const newImage = req.file;
       
       if (!user) return res.status(404).json({ success: false, message: "User not found" });
 
-      const { fullName, bio, category } = req.body;
-      
-      // Upload new image to Cloudinary if file is provided
-      let imageUrl = (user.profile as any)?.imageUrl || null;
+     let imageUrl = user!.profile!.avatarUrl ;
+     let publicId = user!.profile!.publicId ;
 
-      if (req.file) {
-        const result = await cloudinary.uploader.upload(req.file.path, {
-          folder: "profiles",
-        });
-        imageUrl = result.secure_url;
+     if (newImage) {
+      if (publicId) {
+        await cloudinary.uploader.destroy(publicId);
       }
-
-      const profileData = { fullName, bio, imageUrl, category };
+      const result = await cloudinary.uploader.upload(newImage.path, {
+        folder: 'skillsetmm/profiles' ,
+        transformation: [{ 
+          width: 400, 
+          height: 400, 
+          crop: 'fill' , 
+          gravity: 'face' 
+        },
+        {
+          quality: 'auto'
+        },
+        {
+          fetch_format: 'auto'
+        }
+      ],
+      });
+      
+      imageUrl = result.secure_url;
+      publicId = result.public_id;
+    }
+          
+      const profileData = { fullName, bio, category , imageUrl , publicId };
       const profile = await updateUserProfile(userId, profileData);
 
       res.json({
         success: true,
         message: "Profile updated successfully",
-        profile
+        user: user,
       });
     } catch (error) {
       console.error("Profile update error:", error);
@@ -56,3 +75,18 @@ export const updateProfile = [
     }
   }
 ];
+ 
+
+export const getUserData = async (req: Request, res: Response) => {
+  try {
+    const userId = (req.user as any)?.id;
+    const user = await getUserById(userId);
+    res.json({
+      success: true,
+      user: user,
+    });
+  } catch (error) {
+    console.error("Get user data error:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
+  }
+};

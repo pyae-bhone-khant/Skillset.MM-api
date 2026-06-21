@@ -3,6 +3,7 @@ import type { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import router from "./routes/auth.js";
 import profileRouter from "./routes/profile.js";
+import blogRouter from "./routes/blog.js";
 
 export const app = express();
 
@@ -18,6 +19,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/auth", router);
 app.use("/api/v1",  profileRouter);
+app.use("/api/v1",  blogRouter);
+
 
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {

@@ -1,5 +1,10 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
   output   = "../generated/prisma"
 }
 
@@ -7,15 +12,14 @@ datasource db {
   provider = "postgresql"
 }
 
-
-// ၁။ ROLE ကို ENUM အနေနဲ့ သတ်မှတ်မယ် (မှားရိုက်လို့ မရအောင် ကာကွယ်ဖို့)
+// ၁။ ROLE ကို ENUM အနေနဲ့ သတ်မှတ်မယ် (မှားရိုက်လို မရအောင် ကာကွယ်ဖို)
 enum Role {
   STUDENT
   TEACHER
   ADMIN
 }
 
-// ၂။ USER MODEL: အကောင့်ဝင်ဖို့အတွက် အခြေခံအချက်အလက်များ
+// ၂။ USER MODEL: အကောင့်ဝင်ဖိုအတွက် အခြေခံအချက်အလက်များ
 model User {
   id          String   @id @default(uuid())
   email       String   @unique
@@ -37,8 +41,9 @@ model Profile {
   // onDelete: Cascade ကြောင့် Admin က User ကို ဖျက်လိုက်ရင် Profile ပါ တစ်ခါတည်း အလိုအလျောက် ပျက်သွားမယ်
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   fullName   String
-  bio        String?  // ဆရာဆိုရင် သူ့အကြောင်း/ကိုယ်ရေးအကျဉ်း မိတ်ဆက်ရေးဖို့
-  imageUrl  String?  // ပရိုဖိုင်ဓာတ်ပုံအတွက် Cloudinary URL (စစချင်းမှာ null ဖြစ်နိုင်လို့ optional ပေးထားတယ်)
+  bio        String? 
+  publicId   String?  // ဆရာဆိုရင် သူ့အကြောင်း/ကိုယ်ရေးအကျဉ်း မိတ်ဆက်ရေးဖို
+  avatarUrl   String?  // ပရိုဖိုင်ဓာတ်ပုံအတွက် Cloudinary URL (စစချင်းမှာ null ဖြစ်နိုင်လို optional ပေးထားတယ်)
   category   String?  // ဆရာတွေအတွက် သီးသန့်နယ်ပယ် (ဥပမာ - IT, English, Cooking, Art)
   updatedAt  DateTime @updatedAt
 }
@@ -47,8 +52,8 @@ model Profile {
 model Course {
   id          String   @id @default(uuid())
   title       String
-  description String   @db.Text // စာသားအရှည်ကြီး ရေးလို့ရအောင်
-  category    String   // IT, Language, Cooking စသဖြင့် အမျိုးအစား ခွဲဖို့ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လို့ရအောင်)
+  description String   @db.Text // စာသားအရှည်ကြီး ရေးလိုရအောင်
+  category    String   // IT, Language, Cooking စသဖြင့် အမျိုးအစား ခွဲဖို (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လိုရအောင်)
   teacherId   String
   teacher     User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   
@@ -57,10 +62,11 @@ model Course {
   updatedAt   DateTime  @updatedAt
 }
 
-// ၅။ CHAPTER MODEL: သင်တန်းတစ်ခုချင်းစီရဲ့ ဗီဒီယို သင်ခန်းစာ ခေါင်းစဉ်များ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လို့ရအောင်)
+// ၅။ CHAPTER MODEL: သင်တန်းတစ်ခုချင်းစီရဲ့ ဗီဒီယို သင်ခန်းစာ ခေါင်းစဉ်များ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လိုရအောင်)
 model Chapter {
   id        String   @id @default(uuid())
-  title     String   // ဗီဒီယိုခေါင်းစဉ်
+  title     String   // ဗီဒီယိုခေါင်းစဉ် 
+  sortingNo Int       @default(1)// for sorting 
   videoUrl  String   // YouTube Embed Link ဒါမှမဟုတ် တခြား Free Video Link များ
   courseId  String 
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
@@ -70,13 +76,12 @@ model Chapter {
 
 // ၆။ BLOG MODEL: ဆရာတွေ ရေးသား မျှဝေမယ့် ဆောင်းပါးများ
 model Blog {
-  id        String   @id @default(uuid())
+  id       Int @id @default(autoincrement())
   title     String
-  content   String   @db.Text // Blog စာကိုယ် (Rich text တွေ သိမ်းဖို့)
+  content   String   @db.Text // Blog စာကိုယ် (Rich text တွေ သိမ်းဖို)
   category  String   // IT, Art, General Knowledge
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
