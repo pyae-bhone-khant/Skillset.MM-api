@@ -1,10 +1,11 @@
 import type { NextFunction, Request, Response } from "express";
-import { param, query, validationResult } from "express-validator";
+import { body, param, query, validationResult } from "express-validator";
 import { getUserById } from "../../src/services/user.js";
 import { checkUserIfNotExit } from "../utils/user.js";
-import { getBlogById } from "../services/blog.js";
-import { checkBlogIfNotExit } from "../utils/blogs.js";
-import { getBlogByPaginationData } from "../services/blog.js";
+import { createBlogPost, deleteBlogById, getBlogById, updateBlog } from "../services/blog.js";
+import { checkBlogIfNotExit, checkCategoryIfNotExit } from "../utils/blogs.js";
+import { getBlogByPaginationData , getCategoryDataByName } from "../services/blog.js";
+
 
 interface CustomRequest extends Request {
    userId : string; 
@@ -185,5 +186,146 @@ export const   getBlogByCursurPagination : any[] = [
     res.json({ message: "Get blogs" , blogs: blogPosts  , nextPage , newCursor  });
   }
 ];
+
+export const deleteBlog : any[] = [
+    param("id" , "ID must be a positive integer").isInt({ gt: 0 }),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const error = validationResult(req).array({onlyFirstError : true}); 
+
+        if (error.length > 0) {
+            return next(new Error(error[0]?.msg || "Invalid ID"));
+        } 
+
+        const blogId = parseInt(req.params.id as string , 10);
+        const userId = (req as any).user?.id;
+        const user = await getUserById(userId);
+        await checkUserIfNotExit(user); 
+
+        const blog = await getBlogById(blogId);
+        if (!blog) {
+            return next(new Error("Blog not found"));
+        }
+
+        if (blog.authorId !== userId) {
+            return next(new Error("You are not authorized to delete this blog"));
+        }
+
+        await deleteBlogById(blogId);
+        res.json({ message: "Blog deleted successfully" });
+    }
+]; 
+
+export const getBlogByOwner : any[] = [
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const userId = (req as any).user?.id;
+        const user = await getUserById(userId);
+        await checkUserIfNotExit(user); 
+
+        const blogs = await getBlogByPaginationData({
+            where: {
+                authorId: userId
+            },
+            select: {
+                id: true,
+                title: true,
+                content: true,
+                category: {
+                    select: {
+                        name: true
+                    }
+                },
+                author: {
+                    select: {
+                        profile: {
+                            select: {
+                                fullName: true
+                            }
+                        }
+                    }
+                },
+                updatedAt: true
+            },
+            orderBy: {
+                updatedAt: "asc"
+            }
+        }); 
+         if (!blogs || blogs.length === 0) {
+            return next(new Error("you have no blogs"));
+        }
+
+        const blogPosts = blogs.map((blog: any) => ({
+            id: blog.id,
+            title: blog.title,
+            content: blog.content,
+            category: blog.category.name,
+            fullName: blog.author?.profile?.fullName ?? "Unknown Author",
+            updatedAt: blog.updatedAt.toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "long",
+                day: "numeric"
+            })
+        }));
+
+        res.json({ message: "Get blogs by owner", blogs: blogPosts });
+    }
+]; 
+
+
+export const updateBlogByOwner : any[] = [
+    body("title").optional().isString().withMessage("Title must be a string"),
+    body("content").optional().isString().withMessage("Content must be a string"),
+    body("category").optional().isString().withMessage("Category ID must be a string"),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const blogId = parseInt(req.params.id as string , 10);
+        const userId = (req as any).user?.id;
+        const user = await getUserById(userId);
+        await checkUserIfNotExit(user); 
+
+        const blog = await getBlogById(blogId);
+        if (!blog) {
+            return next(new Error("Blog not found"));
+        }
+
+        if (blog.authorId !== userId) {
+            return next(new Error("You are not authorized to update this blog"));
+        }
+
+
+        const { title, content, category } = req.body; 
+        const categoryData = await getCategoryDataByName(category);
+        await checkCategoryIfNotExit(categoryData);  
+
+        const data = {
+            title,
+            content,
+            categoryId: categoryData?.id
+        }
+        await updateBlog(blogId, data);
+        res.json({ message: "Blog updated successfully" });
+    }
+];  
+
+
+export const createBlog : any[] = [
+    body("title").isString().withMessage("Title must be a string"),
+    body("content").isString().withMessage("Content must be a string"),
+    body("category").isString().withMessage("Category must be a string"),
+    async (req: CustomRequest, res: Response, next: NextFunction) => {
+        const userId = (req as any).user?.id;
+        const user = await getUserById(userId);
+        await checkUserIfNotExit(user); 
+
+        const { title, content, category } = req.body; 
+        const data = {
+            title ,
+            content ,
+            categoryName : category ,
+            authorId : userId
+        }
+        await createBlogPost(data as any);
+        res.json({ message: "Blog created successfully" });
+    }
+];
+
 
 
