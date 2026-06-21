@@ -12,6 +12,54 @@ const adapter = new PrismaNeon({
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
+  // Create categories first
+  const itCategory = await prisma.category.upsert({
+    where: { name: 'IT' },
+    update: {},
+    create: {
+      name: 'IT',
+      description: 'Information Technology and Programming'
+    }
+  })
+
+  const languageCategory = await prisma.category.upsert({
+    where: { name: 'Language' },
+    update: {},
+    create: {
+      name: 'Language',
+      description: 'Language Learning and Linguistics'
+    }
+  })
+
+  const cookingCategory = await prisma.category.upsert({
+    where: { name: 'Cooking' },
+    update: {},
+    create: {
+      name: 'Cooking',
+      description: 'Culinary Arts and Cooking Techniques'
+    }
+  })
+
+  const artCategory = await prisma.category.upsert({
+    where: { name: 'Art' },
+    update: {},
+    create: {
+      name: 'Art',
+      description: 'Fine Arts, History, and Culture'
+    }
+  })
+
+  const generalKnowledgeCategory = await prisma.category.upsert({
+    where: { name: 'General Knowledge' },
+    update: {},
+    create: {
+      name: 'General Knowledge',
+      description: 'General Knowledge and Current Affairs'
+    }
+  })
+
+  console.log('Categories created:', itCategory.name, languageCategory.name, cookingCategory.name, artCategory.name, generalKnowledgeCategory.name)
+
   // Create a teacher user first
   const hashedPassword = await bcrypt.hash('password123', 10)
   
@@ -41,7 +89,7 @@ async function main() {
     data: {
       title: 'Complete Web Development Bootcamp 2026',
       description: 'Learn HTML, CSS, JavaScript, React, Node.js and more from scratch. This comprehensive course covers everything you need to become a professional web developer.',
-      category: 'IT',
+      categoryId: itCategory.id,
       teacherId: teacher.id,
       chapters: {
         create: [
@@ -74,7 +122,7 @@ async function main() {
     data: {
       title: 'English for Beginners - A1 Level',
       description: 'Start your English learning journey with this comprehensive beginner course. Cover basic grammar, vocabulary, and conversational skills.',
-      category: 'Language',
+      categoryId: languageCategory.id,
       teacherId: teacher.id,
       chapters: {
         create: [
@@ -99,7 +147,7 @@ async function main() {
     data: {
       title: 'Italian Cooking Masterclass',
       description: 'Learn authentic Italian cooking from pasta to pizza. Master traditional recipes and techniques passed down through generations.',
-      category: 'Cooking',
+      categoryId: cookingCategory.id,
       teacherId: teacher.id,
       chapters: {
         create: [
@@ -143,7 +191,7 @@ WebAssembly enables high-performance applications in the browser, opening new po
 Serverless continues to gain traction, offering scalability and cost-efficiency for modern applications.
 
 Stay tuned for more updates on the ever-changing landscape of web development!`,
-      category: 'IT',
+      categoryId: itCategory.id,
       authorId: teacher.id
     }
   })
@@ -171,7 +219,7 @@ Use apps like Anki to review vocabulary at optimal intervals.
 Break down your learning into manageable, achievable milestones.
 
 Remember: language learning is a marathon, not a sprint!`,
-      category: 'General Knowledge',
+      categoryId: generalKnowledgeCategory.id,
       authorId: teacher.id
     }
   })
@@ -199,7 +247,7 @@ Learn to use salt, acid, and fat to balance flavors.
 Use every part of your ingredients creatively.
 
 Minimalist cooking is about simplicity, intention, and respect for ingredients.`,
-      category: 'Art',
+      categoryId: artCategory.id,
       authorId: teacher.id
     }
   })
@@ -229,7 +277,7 @@ The algorithm learns through trial and error by receiving rewards or penalties.
 Start with Python and libraries like scikit-learn. Practice with datasets from Kaggle and build small projects.
 
 The journey into machine learning is challenging but incredibly rewarding!`,
-      category: 'IT',
+      categoryId: itCategory.id,
       authorId: teacher.id
     }
   })
@@ -261,7 +309,7 @@ The development of linear perspective created depth and realism in paintings.
 
 ## Legacy
 The Renaissance laid the foundation for modern art, science, and philosophy, influencing generations to come.`,
-      category: 'Art',
+      categoryId: artCategory.id,
       authorId: teacher.id
     }
   })
@@ -297,7 +345,7 @@ Burning fossil fuels, deforestation, and industrial activities have dramatically
 5. Educate others
 
 Every action counts in the fight against climate change.`,
-      category: 'General Knowledge',
+      categoryId: generalKnowledgeCategory.id,
       authorId: teacher.id
     }
   })

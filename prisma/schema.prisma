@@ -50,13 +50,13 @@ model Profile {
 
 // ၄။ COURSE MODEL: ဆရာတွေ တင်မယ့် သင်တန်းများ
 model Course {
-  id          String   @id @default(uuid())
+  id          Int @id @default(autoincrement())
   title       String
   description String   @db.Text // စာသားအရှည်ကြီး ရေးလိုရအောင်
-  category    String   // IT, Language, Cooking စသဖြင့် အမျိုးအစား ခွဲဖို (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လိုရအောင်)
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
   teacherId   String
   teacher     User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
-  
   chapters    Chapter[] // One-to-Many: သင်တန်းတစ်ခုမှာ အခန်းတွေ အများကြီး ပါမယ် 
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -64,11 +64,11 @@ model Course {
 
 // ၅။ CHAPTER MODEL: သင်တန်းတစ်ခုချင်းစီရဲ့ ဗီဒီယို သင်ခန်းစာ ခေါင်းစဉ်များ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လိုရအောင်)
 model Chapter {
-  id        String   @id @default(uuid())
+  id        Int @id @default(autoincrement())
   title     String   // ဗီဒီယိုခေါင်းစဉ် 
   sortingNo Int       @default(1)// for sorting 
   videoUrl  String   // YouTube Embed Link ဒါမှမဟုတ် တခြား Free Video Link များ
-  courseId  String 
+  courseId   Int 
   course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -79,9 +79,19 @@ model Blog {
   id       Int @id @default(autoincrement())
   title     String
   content   String   @db.Text // Blog စာကိုယ် (Rich text တွေ သိမ်းဖို)
-  category  String   // IT, Art, General Knowledge
+  categoryId  Int
+  category    Category    @relation(fields: [categoryId], references: [id])
   authorId  String
   author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id          Int    @id @default(autoincrement())
+  name        String    @unique
+  courses     Course[]
+  blogs       Blog[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }

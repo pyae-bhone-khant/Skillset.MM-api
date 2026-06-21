@@ -10,7 +10,11 @@ export const getBlogById = (blogId: number) => {
             id: true,
             title: true,
             content: true,
-            category: true,
+            category: {
+                select: {
+                    name: true
+                }
+            },
             authorId: true,
             author: {
                 select: {
@@ -25,4 +29,8 @@ export const getBlogById = (blogId: number) => {
         }
          
     })
+} 
+
+export const getBlogByPaginationData = (options : any) => {
+    return prisma.blog.findMany(options)
 }
