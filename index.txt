@@ -1,0 +1,80 @@
+import { Worker } from "bullmq";
+import { Redis, ScanStream } from "ioredis";
+
+export const redis = new Redis({
+  host: process.env.REDIS_HOST || "127.0.0.1",
+  port: Number(process.env.REDIS_PORT) || 6379,
+  // Add password if needed: password: process.env.REDIS_PASSWORD,
+});
+
+export const cacheWorker = new Worker("cache-invalidation" , async (job) => {
+
+   const {pattern} = job.data ; 
+   await invalidateChche(pattern)
+   
+}, { 
+    connection : {
+        host : process.env.REDIS_HOST || "127.0.0.1", 
+        port : Number(process.env.REDIS_PORT) || 6379,
+    },
+    concurrency: 5 ,
+    
+})  
+
+cacheWorker.on("completed" , (job) => {
+    console.log(job.id , "completed")
+}) 
+
+cacheWorker.on("error" , (err) => {
+    console.log(err , "error")
+})   
+
+const invalidateChche = async (pattern : string) => {
+    console.log("invalidate" , pattern) ;
+  try {
+    const stream = redis.scanStream({
+      
+      match: pattern, 
+      count: 100,
+    }); 
+
+    const pipeline = redis.pipeline(); 
+    let totalKeys = 0; 
+
+    stream.on("data" , (keys : string[]) => {
+        console.log("Found keys to delete:", keys)
+       if (totalKeys > 0) {
+        keys.forEach((key) => {
+          pipeline.del(key) 
+          totalKeys++;
+        });
+       }
+    }); 
+
+    await new Promise<void>((resolve , reject) => {
+      stream.on("end" , async () => {
+        try{
+         if (totalKeys > 0) {
+            const result = await pipeline.exec(); 
+            console.log(`Invalidated ${totalKeys} keys`)
+            console.log("Pipeline execution result:", result); // ဒီ log ကိုကြည့်ပါ
+            console.log(`Successfully invalidated ${totalKeys} keys`);
+         } else {
+            console.log("No keys found to delete.");
+         }
+         resolve();
+        } catch (errorExce) { 
+            console.error("Pipeline Error:", errorExce); // Error ရှိမရှိ ဒီမှာကြည့်ပါ
+            reject(errorExce) ;
+        } 
+      }); 
+      stream.on("error", (error) => {
+        reject(error);
+      }); 
+    }) 
+  } catch (error) {
+    console.log("Error in cache invalidation:", error);
+    throw error; 
+  }
+}
+

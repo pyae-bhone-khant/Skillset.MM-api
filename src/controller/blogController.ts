@@ -5,6 +5,8 @@ import { checkUserIfNotExit } from "../utils/user.js";
 import { createBlogPost, deleteBlogById, getBlogById, updateBlog } from "../services/blog.js";
 import { checkBlogIfNotExit, checkCategoryIfNotExit } from "../utils/blogs.js";
 import { getBlogByPaginationData , getCategoryDataByName } from "../services/blog.js";
+import { getOrCache } from "../lib/cache.js";
+import { cacheQueue } from "../jobs/queue/cacheQueue.js";
 
 
 interface CustomRequest extends Request {
@@ -23,8 +25,10 @@ export const getOneBlog  : any[] = [
     const userId = (req as any).user?.id;
     const user = await getUserById(userId);
     await checkUserIfNotExit(user);
+    
+    const cacheKey = `blogs:${JSON.stringify(blogId)}`
 
-    const blog  = await getBlogById(blogId);
+    const blog  = await getOrCache(cacheKey , async () => await getBlogById(blogId)); 
     await checkBlogIfNotExit(blog);
 
     const blogPost = {
@@ -91,8 +95,8 @@ export  const getBlogByPagination  : any[] = [
         }
         
      } 
-    
-    const blogs = await getBlogByPaginationData(options); 
+     const cacheKey = `blogs:${JSON.stringify(req.query)}` ;
+     const blogs = await getOrCache(cacheKey, async() => await getBlogByPaginationData(options)); 
     const hasNextPage = blogs.length > +limit; 
     let nextPage = null;
     let previousPage = +page !== 1 ? +page - 1 : null;
@@ -164,7 +168,10 @@ export const   getBlogByCursurPagination : any[] = [
         }
         
      }  
-     const blogs = await getBlogByPaginationData(options); 
+     const cacheKey  = `blogs:${JSON.stringify(req.query)}`
+    const blogs = await getOrCache(cacheKey , async() => {
+        return await getBlogByPaginationData(options)
+     })        
      const blogPosts = blogs.map((blog: any) => ({
         id: blog.id,
         title: blog.title,
@@ -211,6 +218,14 @@ export const deleteBlog : any[] = [
         }
 
         await deleteBlogById(blogId);
+        await cacheQueue.add("delete-cache-blogs" , {
+            pattern: `blogs:*`} ,
+            {
+                jobId : `invalidate ${Date.now()}` ,
+                priority : 1 
+            }
+
+        );
         res.json({ message: "Blog deleted successfully" });
     }
 ]; 
@@ -220,7 +235,8 @@ export const getBlogByOwner : any[] = [
         const userId = (req as any).user?.id;
         const user = await getUserById(userId);
         await checkUserIfNotExit(user); 
-
+        
+         
         const blogs = await getBlogByPaginationData({
             where: {
                 authorId: userId
@@ -251,7 +267,7 @@ export const getBlogByOwner : any[] = [
         }); 
          if (!blogs || blogs.length === 0) {
             return next(new Error("you have no blogs"));
-        }
+        } 
 
         const blogPosts = blogs.map((blog: any) => ({
             id: blog.id,
@@ -300,7 +316,16 @@ export const updateBlogByOwner : any[] = [
             content,
             categoryId: categoryData?.id
         }
-        await updateBlog(blogId, data);
+        await updateBlog(blogId, data); 
+      
+        await cacheQueue.add("delete-cache-blogs" , {
+            pattern: `blogs:*`} ,
+            {
+                jobId : `invalidate ${Date.now()}` ,
+                priority : 1 
+            }
+        );
+
         res.json({ message: "Blog updated successfully" });
     }
 ];  
@@ -323,6 +348,13 @@ export const createBlog : any[] = [
             authorId : userId
         }
         await createBlogPost(data as any);
+        await cacheQueue.add("delete-cache-blogs" , {
+            pattern: `blogs:*`},
+            {
+                jobId : `invalidate ${Date.now()}` ,
+                priority : 1 
+            }
+        );
         res.json({ message: "Blog created successfully" });
     }
 ];
