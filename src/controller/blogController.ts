@@ -44,7 +44,7 @@ export const getOneBlog  : any[] = [
         })
     }
 
-    res.json({ message: "Get one blog",  blog: blogPost });
+    res.status(200).json({ message: "Get one blog",  blog: blogPost });
   }
 ];
 
@@ -117,7 +117,7 @@ export  const getBlogByPagination  : any[] = [
         })
     }));
     
-    res.json({ message: "Get blogs" , blogs: blogPosts  , nextPage , previousPage });
+    res.status(200).json({ message: "Get blogs" , blogs: blogPosts  , nextPage , previousPage });
   }
 ];
 
@@ -190,7 +190,7 @@ export const   getBlogByCursurPagination : any[] = [
     } 
     const newCursor = blogs.length > 0 ? blogs[blogs.length - 1]!.id : null;
     
-    res.json({ message: "Get blogs" , blogs: blogPosts  , nextPage , newCursor  });
+    res.status(200).json({ message: "Get blogs" , blogs: blogPosts  , nextPage , newCursor  });
   }
 ];
 
@@ -226,7 +226,7 @@ export const deleteBlog : any[] = [
             }
 
         );
-        res.json({ message: "Blog deleted successfully" });
+        res.status(200).json({ message: "Blog deleted successfully" });
     }
 ]; 
 
@@ -265,10 +265,7 @@ export const getBlogByOwner : any[] = [
                 updatedAt: "asc"
             }
         }); 
-         if (!blogs || blogs.length === 0) {
-            return next(new Error("you have no blogs"));
-        } 
-
+        
         const blogPosts = blogs.map((blog: any) => ({
             id: blog.id,
             title: blog.title,
@@ -282,7 +279,7 @@ export const getBlogByOwner : any[] = [
             })
         }));
 
-        res.json({ message: "Get blogs by owner", blogs: blogPosts });
+        res.status(200).json({ message: "Get blogs by owner", blogs: blogPosts });
     }
 ]; 
 
@@ -326,7 +323,7 @@ export const updateBlogByOwner : any[] = [
             }
         );
 
-        res.json({ message: "Blog updated successfully" });
+        res.status(200).json({ message: "Blog updated successfully" });
     }
 ];  
 
@@ -355,7 +352,7 @@ export const createBlog : any[] = [
                 priority : 1 
             }
         );
-        res.json({ message: "Blog created successfully" });
+        res.status(201).json({ message: "Blog created successfully" });
     }
 ];
 

@@ -32,7 +32,8 @@ export const getUserById = (id: string) => {
             id
         },
         include: {
-            profile: true
+            profile: true ,
+            courses : true
         }
     });
 }

@@ -4,6 +4,10 @@ import cors from "cors";
 import router from "./routes/auth.js";
 import profileRouter from "./routes/profile.js";
 import blogRouter from "./routes/blog.js";
+import courseRouter from "./routes/course.js";
+import courseTeacherRouter from "./routes/teacher/course.js";
+import capterRoute from "./routes/chapter.js";
+import capterTeacherRoute from "./routes/teacher/chapter.js";
 
 export const app = express();
 
@@ -20,6 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use("/api/v1/auth", router);
 app.use("/api/v1",  profileRouter);
 app.use("/api/v1",  blogRouter);
+app.use("/api/v1" , courseRouter) ;
+app.use("/api/v1"  , courseTeacherRouter );
+app.use("/api/v1" , capterRoute);
+app.use('/api/v1'  , capterTeacherRoute);
 
 
 

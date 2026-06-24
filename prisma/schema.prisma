@@ -53,9 +53,11 @@ model Course {
   id          Int @id @default(autoincrement())
   title       String
   description String   @db.Text // စာသားအရှည်ကြီး ရေးလိုရအောင်
+  imageUrl   String
+  publicId   String
   categoryId  Int
   category    Category    @relation(fields: [categoryId], references: [id])
-  teacherId   String
+  teacherId   String 
   teacher     User     @relation(fields: [teacherId], references: [id], onDelete: Cascade)
   chapters    Chapter[] // One-to-Many: သင်တန်းတစ်ခုမှာ အခန်းတွေ အများကြီး ပါမယ် 
   createdAt   DateTime  @default(now())
@@ -63,7 +65,7 @@ model Course {
 }
 
 // ၅။ CHAPTER MODEL: သင်တန်းတစ်ခုချင်းစီရဲ့ ဗီဒီယို သင်ခန်းစာ ခေါင်းစဉ်များ (ENUM မသုံးဘူး အလွယ်တကူ ပြင်လိုရအောင်)
-model Chapter {
+model Chapter { 
   id        Int @id @default(autoincrement())
   title     String   // ဗီဒီယိုခေါင်းစဉ် 
   sortingNo Int       @default(1)// for sorting 

@@ -17,8 +17,7 @@ async function main() {
     where: { name: 'IT' },
     update: {},
     create: {
-      name: 'IT',
-      description: 'Information Technology and Programming'
+      name: 'IT'
     }
   })
 
@@ -26,8 +25,7 @@ async function main() {
     where: { name: 'Language' },
     update: {},
     create: {
-      name: 'Language',
-      description: 'Language Learning and Linguistics'
+      name: 'Language'
     }
   })
 
@@ -35,8 +33,7 @@ async function main() {
     where: { name: 'Cooking' },
     update: {},
     create: {
-      name: 'Cooking',
-      description: 'Culinary Arts and Cooking Techniques'
+      name: 'Cooking'
     }
   })
 
@@ -44,8 +41,7 @@ async function main() {
     where: { name: 'Art' },
     update: {},
     create: {
-      name: 'Art',
-      description: 'Fine Arts, History, and Culture'
+      name: 'Art'
     }
   })
 
@@ -53,8 +49,7 @@ async function main() {
     where: { name: 'General Knowledge' },
     update: {},
     create: {
-      name: 'General Knowledge',
-      description: 'General Knowledge and Current Affairs'
+      name: 'General Knowledge'
     }
   })
 
@@ -89,6 +84,8 @@ async function main() {
     data: {
       title: 'Complete Web Development Bootcamp 2026',
       description: 'Learn HTML, CSS, JavaScript, React, Node.js and more from scratch. This comprehensive course covers everything you need to become a professional web developer.',
+      imageUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800&h=400&fit=crop',
+      publicId: 'courses/web_dev_bootcamp',
       categoryId: itCategory.id,
       teacherId: teacher.id,
       chapters: {
@@ -122,6 +119,8 @@ async function main() {
     data: {
       title: 'English for Beginners - A1 Level',
       description: 'Start your English learning journey with this comprehensive beginner course. Cover basic grammar, vocabulary, and conversational skills.',
+      imageUrl: 'https://images.unsplash.com/photo-1543109740-4bdb38fda756?w=800&h=400&fit=crop',
+      publicId: 'courses/english_beginners',
       categoryId: languageCategory.id,
       teacherId: teacher.id,
       chapters: {
@@ -147,6 +146,8 @@ async function main() {
     data: {
       title: 'Italian Cooking Masterclass',
       description: 'Learn authentic Italian cooking from pasta to pizza. Master traditional recipes and techniques passed down through generations.',
+      imageUrl: 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop',
+      publicId: 'courses/italian_cooking',
       categoryId: cookingCategory.id,
       teacherId: teacher.id,
       chapters: {
