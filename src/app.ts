@@ -9,7 +9,7 @@ import courseTeacherRouter from "./routes/teacher/course.js";
 import capterRoute from "./routes/chapter.js";
 import capterTeacherRoute from "./routes/teacher/chapter.js";
 import categoryRouter from "./routes/admin/category/category.js";
-
+import adminRouter from "./routes/admin/admin.js";
 export const app = express();
 
 app.use(cors({
@@ -30,8 +30,7 @@ app.use("/api/v1"  , courseTeacherRouter );
 app.use("/api/v1" , capterRoute);
 app.use('/api/v1'  , capterTeacherRoute);
 app.use("/api/v1" ,  categoryRouter)
-
-
+app.use("/api/v1" ,  adminRouter)
 
 app.use((error: any, req: Request, res: Response, next: NextFunction) => {
   const status = error.status || 500;
