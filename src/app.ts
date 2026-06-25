@@ -8,6 +8,7 @@ import courseRouter from "./routes/course.js";
 import courseTeacherRouter from "./routes/teacher/course.js";
 import capterRoute from "./routes/chapter.js";
 import capterTeacherRoute from "./routes/teacher/chapter.js";
+import categoryRouter from "./routes/admin/category/category.js";
 
 export const app = express();
 
@@ -28,6 +29,7 @@ app.use("/api/v1" , courseRouter) ;
 app.use("/api/v1"  , courseTeacherRouter );
 app.use("/api/v1" , capterRoute);
 app.use('/api/v1'  , capterTeacherRoute);
+app.use("/api/v1" ,  categoryRouter)
 
 
 
