@@ -1,7 +1,9 @@
 # Use Node.js LTS version
 FROM node:20-alpine
+
 # Set working directory
 WORKDIR /app
+
 # Copy package files
 COPY package*.json ./
 
@@ -11,7 +13,6 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-
 # Build TypeScript
 RUN npm run build
 
@@ -20,13 +21,8 @@ RUN npx prisma generate
 
 # Set environment variables
 ENV NODE_ENV=production
-ENV PORT=6000
-ENV FRONTEND_URL=https://skillset-mm-app.vercel.app
 ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
 
-# Expose port
-EXPOSE 6000
-
-# Start the application
-CMD ["npm", "start"]
+# Start the worker
+CMD ["npm", "run", "work"]
