@@ -11,12 +11,11 @@ RUN npm ci
 # Copy source code
 COPY . .
 
+# Generate Prisma client
+RUN npx prisma generate
 
 # Build TypeScript
 RUN npm run build
-
-# Generate Prisma client
-RUN npx prisma generate
 
 # Set environment variables
 ENV NODE_ENV=production
