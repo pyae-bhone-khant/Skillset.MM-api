@@ -13,10 +13,10 @@ import adminRouter from "./routes/admin/admin.js";
 export const app = express();
 
 app.use(cors({
-  origin: '*',
+  origin: process.env.FRONTEND_URL || '*',
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["*"],
-  // credentials: true, // ဒါက အရေးကြီးဆုံးပါ
+  credentials: true,
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
