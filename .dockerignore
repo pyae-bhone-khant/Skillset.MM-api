@@ -7,3 +7,4 @@ dist
 *.md
 index.txt
 prisma/config.ts
+generated
