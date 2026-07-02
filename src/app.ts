@@ -13,9 +13,9 @@ import adminRouter from "./routes/admin/admin.js";
 export const app = express();
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
+  origin: process.env.FRONTEND_URL || 'https://skillset-mm-app.vercel.app' || '*',
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["*"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
 }));
 app.use(express.json());
