@@ -80,7 +80,7 @@ export const getCourseByPagination = [
                 fullName: c.teacher.profile.fullName,
                 avatarUrl: c.teacher.profile.avatarUrl,
                 chapters: c.chapters,
-                updatedAt: c.updatedAt.toLocaleDateString("en-US", {
+                updatedAt: new Date(c.updatedAt).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric"
@@ -157,7 +157,7 @@ export const getCourseByCoursePagination =  [
                 fullName: c.teacher.profile.fullName,
                 avatarUrl: c.teacher.profile.avatarUrl,
                 chapters: c.chapters,
-                updatedAt: c.updatedAt.toLocaleDateString("en-US", {
+                updatedAt: new Date(c.updatedAt).toLocaleDateString("en-US", {
                     year: "numeric",
                     month: "long",
                     day: "numeric"
@@ -189,7 +189,7 @@ export const getCourseByOwner = async (req : Request , res : Response , next : N
         imageUrl : c.imageUrl ,
         fullName: c.teacher.profile.fullName,
         avatarUrl: c.teacher.profile.avatarUrl,
-        updatedAt: c.updatedAt.toLocaleDateString("en-US", {
+        updatedAt: new Date(c.updatedAt).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric"

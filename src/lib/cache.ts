@@ -1,51 +1,38 @@
-import { Redis } from "ioredis";
+import { redis } from "./redis.js";
 
-// Render ပေါ်မှာဆိုရင် Connection URL သုံးမယ်၊ Local ဆိုရင် host/port နဲ့ သွားမယ်
-export const redis = process.env.REDIS_URL
-  ? new Redis(process.env.REDIS_URL, {
-      tls: {
-        rejectUnauthorized: false, // Upstash ရဲ့ SSL ကို အဆင်ပြေပြေ လက်ခံဖို့
-      },
-    })
-  : new Redis({
-      host: process.env.REDIS_HOST || "127.0.0.1",
-      port: Number(process.env.REDIS_PORT) || 6379,
-    });
+// Log Redis connection status so you can see what's happening
+redis.on("connect", () => console.log("✅ Redis connected"));
+redis.on("error", (err) => console.error("❌ Redis connection error:", err.message));
 
 export const getOrCache = async (key: any, cb: any) => {
   try {
-    const cachedData = await redis.get(key);
-    if (cachedData) {
-      console.log("from cache");
-      const data = JSON.parse(cachedData);
-      return reviveDates(data);
+    // Check if Redis is actually connected before attempting cache operations
+    if (redis.status === "ready") {
+      const cachedData = await redis.get(key);
+      if (cachedData) {
+        console.log("Cache hit:", key);
+        return JSON.parse(cachedData);
+      }
+      console.log("Cache miss:", key);
+    } else {
+      console.log("Redis not ready (status:", redis.status, "), skipping cache for:", key);
     }
-
-    console.log("cache miss");
-    const freshData = await cb();
-    await redis.setex(key, 3600, JSON.stringify(freshData)); // for 1 hour
-
-    return freshData;
-  } catch (err) {
-    console.log(err);
-    throw err;
+  } catch (error) {
+    // Redis failed — log it but don't crash, fall through to callback
+    console.error("Redis GET error:", error);
   }
+
+  // Fallback: fetch fresh data from the database
+  const freshData = await cb();
+
+  // Try to cache the result, but don't fail if Redis is down
+  try {
+    if (redis.status === "ready") {
+      await redis.setex(key, 3600, JSON.stringify(freshData)); // Cache for 1 hour
+    }
+  } catch (error) {
+    console.error("Redis SETEX error:", error);
+  }
+
+  return freshData;
 };
-
-function reviveDates(data: any): any {
-  if (typeof data !== 'object' || data === null) return data;
-
-  if (Array.isArray(data)) {
-    return data.map(reviveDates);
-  }
-
-  const revived: any = { ...data };
-  for (const key in revived) {
-    if (key === 'updatedAt' && typeof revived[key] === 'string') {
-      revived[key] = new Date(revived[key]);
-    } else if (typeof revived[key] === 'object') {
-      revived[key] = reviveDates(revived[key]);
-    }
-  }
-  return revived;
-}

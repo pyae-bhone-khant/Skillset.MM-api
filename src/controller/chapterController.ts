@@ -56,7 +56,7 @@ export const getChapterAll = [
       },
     };
 
-    const cacheKey = `chapters:${JSON.stringify(req.query)}`;
+    const cacheKey = `chapters:${id}:${JSON.stringify(req.query)}`;
     const chapters = await getOrCache(
       cacheKey,
       async () => await getChapterByCourseId(option),
@@ -77,7 +77,7 @@ export const getChapterAll = [
         sortingNo: c.sortingNo,
         fullName: c.course.teacher.profile.fullName,
         avatarUrl: c.course.teacher.profile.avatarUrl,
-        updatedAt: c.updatedAt.toLocaleDateString("en-US", {
+        updatedAt: new Date(c.updatedAt).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",
@@ -147,7 +147,7 @@ export const getChapterByCusurPagelitaion = [
       },
     };
 
-    const cacheKey = `chapters:${JSON.stringify(req.query)}`;
+    const cacheKey = `chapters:${id}:${JSON.stringify(req.query)}`;
     const chapters = await getOrCache(
       cacheKey,
       async () => await getChapterByCourseId(option),
@@ -160,7 +160,7 @@ export const getChapterByCusurPagelitaion = [
         sortingNo: c.sortingNo,
         fullName: c.course.teacher.profile.fullName,
         avatarUrl: c.course.teacher.profile.avatarUrl,
-        updatedAt: c.updatedAt.toLocaleDateString("en-US", {
+        updatedAt: new Date(c.updatedAt).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",

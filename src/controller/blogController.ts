@@ -38,7 +38,7 @@ export const getOneBlog  : any[] = [
         category: blog!.category.name,
         fullName: blog!.author.profile?.fullName ,
         avatarUrl : blog!.author.profile?.avatarUrl  ? blog!.author.profile?.avatarUrl : "" ,
-        updatedAt: blog!.updatedAt.toLocaleDateString("en-US", {
+        updatedAt: new Date(blog!.updatedAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric"
@@ -111,7 +111,7 @@ export  const getBlogByPagination  : any[] = [
         content: blog.content,
         category: blog.category.name,
         fullName: blog.author?.profile?.fullName ?? "Unknown Author",
-        updatedAt: blog.updatedAt.toLocaleDateString("en-US", {
+        updatedAt: new Date(blog.updatedAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric"
@@ -179,7 +179,7 @@ export const   getBlogByCursurPagination : any[] = [
         content: blog.content,
         category: blog.category.name,
         fullName: blog.author?.profile?.fullName ?? "Unknown Author",
-        updatedAt: blog.updatedAt.toLocaleDateString("en-US", {
+        updatedAt: new Date(blog.updatedAt).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric"
@@ -273,7 +273,7 @@ export const getBlogByOwner : any[] = [
             content: blog.content,
             category: blog.category.name,
             fullName: blog.author?.profile?.fullName ?? "Unknown Author",
-            updatedAt: blog.updatedAt.toLocaleDateString("en-US", {
+            updatedAt: new Date(blog.updatedAt).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
                 day: "numeric"
