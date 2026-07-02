@@ -1,12 +1,34 @@
 import { Worker } from "bullmq";
-// import { redis } from "../../../config/redisClient";
-import {Redis} from "ioredis";
+import { Redis } from "ioredis";
 
-export const redis = new Redis({
-  host: process.env.REDIS_HOST || "127.0.0.1",
-  port: Number(process.env.REDIS_PORT) || 6379,
-  // Add password if needed: password: process.env.REDIS_PASSWORD,
-});
+// ၁။ ၎င်းဖိုင်အတွင်းသုံးမည့် Redis client (invalidateCache အတွက်)
+export const redis = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, { tls: { rejectUnauthorized: false } })
+  : new Redis({
+      host: process.env.REDIS_HOST || "127.0.0.1",
+      port: Number(process.env.REDIS_PORT) || 6379,
+    });
+
+// ၂။ Worker အတွက် Connection Config သတ်မှတ်ခြင်း
+const getWorkerConnectionOptions = () => {
+  if (process.env.REDIS_URL) {
+    return {
+      url: process.env.REDIS_URL,
+      tls: {
+        rejectUnauthorized: false,
+      },
+      maxRetriesPerRequest: null, // BullMQ Worker အတွက် မဖြစ်မနေလိုအပ်သည်
+      connectTimeout: 10000,
+    };
+  }
+
+  return {
+    host: process.env.REDIS_HOST || "127.0.0.1",
+    port: Number(process.env.REDIS_PORT) || 6379,
+    maxRetriesPerRequest: null,
+    connectTimeout: 10000,
+  };
+};
 
 export const caheWorker = new Worker(
   "cache-invalidation",
@@ -15,13 +37,8 @@ export const caheWorker = new Worker(
     await invalidateCache(pattern);
   },
   {
-    //connection: redis,
-    connection: {
-      host: process.env.REDIS_HOST || "127.0.0.1",
-      port: Number(process.env.REDIS_PORT!) || 6379,
-      connectTimeout: 10000
-    },
-    concurrency: 5, // Proccess 5 jobs concurrently
+    connection: getWorkerConnectionOptions(), // ဒီနေရာမှာ configuration အား ပေးလိုက်ခြင်း
+    concurrency: 5,
   },
 );
 
@@ -36,14 +53,13 @@ caheWorker.on("failed", (job: any, err) => {
 const invalidateCache = async (pattern: string) => {
   try {
     const stream = redis.scanStream({
-      match: pattern, // "products:*"
+      match: pattern,
       count: 100,
     });
 
     const pipeline = redis.pipeline();
     let totalKeys = 0;
 
-    // Process keys in batches
     stream.on("data", (keys: string[]) => {
       if (keys.length > 0) {
         keys.forEach((key) => {
@@ -53,7 +69,6 @@ const invalidateCache = async (pattern: string) => {
       }
     });
 
-    // Wrap stream events in a Promise
     await new Promise<void>((resolve, reject) => {
       stream.on("end", async () => {
         try {
@@ -67,7 +82,7 @@ const invalidateCache = async (pattern: string) => {
         }
       });
 
-      stream.on("error", (error : any) => {
+      stream.on("error", (error: any) => {
         reject(error);
       });
     });
