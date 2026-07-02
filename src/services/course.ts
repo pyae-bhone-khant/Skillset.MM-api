@@ -55,7 +55,7 @@ export const createCourseData = (courseData : any) => {
               connect : {
                 id : courseData.teacherId
               }
-            }
+            } 
       }
     })
 } 

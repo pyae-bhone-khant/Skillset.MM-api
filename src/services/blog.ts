@@ -1,7 +1,7 @@
 
 import { prisma } from "../lib/prisma.js";
 
-export const getBlogById = (blogId: number) => {
+export const getBlogById = async (blogId: number) => {
     return prisma.blog.findUnique({
         where: {
             id: blogId
@@ -20,7 +20,8 @@ export const getBlogById = (blogId: number) => {
                 select: {
                     profile : {
                         select: {
-                            fullName: true
+                            fullName: true ,
+                            avatarUrl : true
                         }
                     }
                 }

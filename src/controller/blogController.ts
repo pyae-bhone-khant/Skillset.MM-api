@@ -37,6 +37,7 @@ export const getOneBlog  : any[] = [
         content: blog!.content,
         category: blog!.category.name,
         fullName: blog!.author.profile?.fullName ,
+        avatarUrl : blog!.author.profile?.avatarUrl  ? blog!.author.profile?.avatarUrl : "" ,
         updatedAt: blog!.updatedAt.toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",

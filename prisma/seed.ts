@@ -92,23 +92,23 @@ async function main() {
         create: [
           {
             title: 'Introduction to Web Development',
-            videoUrl: 'https://www.youtube.com/embed/kUMe1FH4CHE?si=example1'
+            videoUrl: 'https://www.youtube.com/embed/Q33KBiAkri0'
           },
           {
             title: 'HTML Fundamentals',
-            videoUrl: 'https://www.youtube.com/embed/qz0aGYrrlhU?si=example2'
+            videoUrl: 'https://www.youtube.com/embed/pQN-pnXPaVg'
           },
           {
             title: 'CSS Styling and Layout',
-            videoUrl: 'https://www.youtube.com/embed/1Rs2ND1ryYc?si=example3'
+            videoUrl: 'https://www.youtube.com/embed/1Rs2ND1ryYc'
           },
           {
             title: 'JavaScript Basics',
-            videoUrl: 'https://www.youtube.com/embed/hdI2bqOjy3c?si=example4'
+            videoUrl: 'https://www.youtube.com/embed/hdI2bqOjy3c'
           },
           {
             title: 'React Framework Introduction',
-            videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk?si=example5'
+            videoUrl: 'https://www.youtube.com/embed/SqcY0GlETPk'
           }
         ]
       }
@@ -127,15 +127,15 @@ async function main() {
         create: [
           {
             title: 'Alphabet and Pronunciation',
-            videoUrl: 'https://www.youtube.com/embed/0-gN58kYD8k?si=example6'
+            videoUrl: 'https://www.youtube.com/embed/lA3s8qTzIYQ'
           },
           {
             title: 'Basic Greetings and Introductions',
-            videoUrl: 'https://www.youtube.com/embed/L0B7X9X6Y7k?si=example7'
+            videoUrl: 'https://www.youtube.com/embed/ewGp4T1n-_8'
           },
           {
             title: 'Numbers and Counting',
-            videoUrl: 'https://www.youtube.com/embed/D0Aq68JpQO8?si=example8'
+            videoUrl: 'https://www.youtube.com/embed/D0Aq68JpQO8'
           }
         ]
       }
@@ -154,15 +154,15 @@ async function main() {
         create: [
           {
             title: 'Making Fresh Pasta from Scratch',
-            videoUrl: 'https://www.youtube.com/embed/J5v7fTq9k2E?si=example9'
+            videoUrl: 'https://www.youtube.com/embed/JPd7eKbXeO0'
           },
           {
             title: 'Classic Margherita Pizza',
-            videoUrl: 'https://www.youtube.com/embed/YRtVZqQ-7n8?si=example10'
+            videoUrl: 'https://www.youtube.com/embed/YRtVZqQ-7n8'
           },
           {
             title: 'Risotto Techniques',
-            videoUrl: 'https://www.youtube.com/embed/3p-1i9mQGY8?si=example11'
+            videoUrl: 'https://www.youtube.com/embed/3p-1i9mQGY8'
           }
         ]
       }

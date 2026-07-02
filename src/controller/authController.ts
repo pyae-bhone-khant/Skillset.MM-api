@@ -4,6 +4,7 @@ import { createUser, getUserByEmail } from "../services/user.js";
 import { checkUserExit, checkUserIfNotExit } from "../utils/user.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/generateToken.js";
+import { getOrCache } from "../lib/cache.js";
 
 export const register =  [
 body("email").isEmail().withMessage("Invalid email"),
@@ -40,7 +41,12 @@ async (req: Request, res: Response , next : NextFunction) => {
         password: hashedPassword,
         name
     } 
-    await createUser(userData);
+    // await createUser(userData);
+     const cacheKey = `users:`;
+      const categories = await getOrCache(
+        cacheKey,
+        async () => await createUser(userData),
+      );
      
     res.status(200).json({
         success: true,
