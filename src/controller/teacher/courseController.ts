@@ -147,4 +147,5 @@ export const updateCourse : any =  [
                   );    
     
     res.status(200).json({ success : true ,  message : " update  Course  successfully" , course : course })
-}]
+}] 
+

@@ -1,11 +1,9 @@
 import { Redis } from "ioredis";
 
-
-const redisOptions = process.env.REDIS_URL 
-  ? process.env.REDIS_URL 
-  : { host: process.env.REDIS_HOST || "127.0.0.1", port: Number(process.env.REDIS_PORT) || 6379 };
-
-export const redis = new Redis(redisOptions as any, {
+// REDIS_HOST နှင့် REDIS_PORT ကို အမြဲသုံးရန် သတ်မှတ်ခြင်း
+export const redis = new Redis({
+  host: process.env.REDIS_HOST || "127.0.0.1",
+  port: Number(process.env.REDIS_PORT) || 6379,
   maxRetriesPerRequest: null,
-  tls: process.env.REDIS_URL ? { rejectUnauthorized: false } : undefined,
+ 
 });
